@@ -1,31 +1,32 @@
 @echo off
-REM Windows 打包脚本
+chcp 65001 >nul
+REM Windows build script for NASPT EXE
 echo ==========================================
-echo 开始打包 NASPT 为单文件 EXE
+echo Building NASPT as single EXE file
 echo ==========================================
 
-REM 检查是否安装了 PyInstaller
+REM Check if PyInstaller is installed
 python -c "import PyInstaller" 2>nul
 if errorlevel 1 (
-    echo 错误: 未安装 PyInstaller
-    echo 正在安装 PyInstaller...
-    pip install pyinstaller
+    echo Error: PyInstaller not installed
+    echo Installing PyInstaller...
+    python -m pip install pyinstaller
 )
 
-REM 清理之前的构建
+REM Clean previous builds
 cd /d %~dp0\..
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
 if exist naspt.spec del naspt.spec
 
 echo.
-echo 开始打包...
+echo Starting build...
 pyinstaller scripts\build-exe.spec
 
 if errorlevel 1 (
     echo.
     echo ==========================================
-    echo 打包失败！
+    echo Build failed!
     echo ==========================================
     pause
     exit /b 1
@@ -33,12 +34,11 @@ if errorlevel 1 (
 
 echo.
 echo ==========================================
-echo 打包完成！
+echo Build completed!
 echo ==========================================
-echo EXE 文件位置: dist\naspt.exe
+echo EXE file location: dist\naspt.exe
 echo.
-echo 文件大小:
+echo File size:
 dir dist\naspt.exe
 echo.
 pause
-
