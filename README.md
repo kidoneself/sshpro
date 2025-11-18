@@ -169,6 +169,22 @@ docker buildx create --name multiarch-builder --use
 bash scripts/build-docker.sh latest kidself
 ```
 
+### GitHub Actions 自动构建
+
+项目已配置 GitHub Actions，推送到 `main` 分支会自动构建：
+
+- **macOS 应用**：自动打包为 `.app` 和 `.zip`
+- **Windows 可执行文件**：自动打包为 `.exe`
+- **Docker 镜像**：自动构建多架构镜像并推送到 Docker Hub
+
+**配置 Docker Hub Secrets**（首次使用需要）：
+1. 进入 GitHub 仓库：`Settings` → `Secrets and variables` → `Actions`
+2. 添加以下 Secrets：
+   - `DOCKER_USERNAME`：你的 Docker Hub 用户名
+   - `DOCKER_PASSWORD`：你的 Docker Hub Access Token
+
+详细说明请查看：[GitHub Actions 文档](docs/GITHUB_ACTIONS.md)
+
 ## 注意事项
 
 1. SSH密码会以Base64编码保存在浏览器localStorage中，不是真正的加密，请谨慎使用
