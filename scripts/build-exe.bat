@@ -21,7 +21,7 @@ if exist naspt.spec del naspt.spec
 
 echo.
 echo Starting build...
-pyinstaller scripts\build-exe.spec
+python -m PyInstaller scripts\build-exe.spec
 
 if errorlevel 1 (
     echo.
