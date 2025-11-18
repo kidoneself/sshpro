@@ -1,0 +1,26 @@
+# Cloudflare Workers 配置文件
+# 文档: https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "naspt-services"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# 部署后的 Workers 域名将是: naspt-services.你的账号.workers.dev
+# 你也可以绑定自定义域名
+
+# Workers 路由配置
+# routes = [
+#   { pattern = "example.com/api/*", zone_name = "example.com" }
+# ]
+
+# 环境变量（如需要）
+# [vars]
+# API_KEY = "your-api-key"
+
+# KV 存储配置 - 用于动态服务管理
+# 首次部署前需要创建 KV namespace:
+# wrangler kv:namespace create "SERVICES_KV"
+# 然后将返回的 id 填入下方
+[[kv_namespaces]]
+binding = "SERVICES_KV"
+id = "81f03148479741a6a1e44be9dc8f31e3"

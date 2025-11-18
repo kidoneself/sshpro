@@ -1,0 +1,22 @@
+{
+  "name": "naspt-services-worker",
+  "version": "1.0.0",
+  "description": "NASPT 服务配置生成器 - Cloudflare Worker",
+  "main": "worker.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "naspt",
+    "docker"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

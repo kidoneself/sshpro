@@ -1,0 +1,89 @@
+/**
+ * 服务配置数据
+ * 从 services.example.json 转换而来
+ */
+
+export const SERVICES_DATA = {
+  "version": "1.0",
+  "description": "Docker服务配置模板",
+  "services": {
+    "moviepilot": {
+      "name": "MoviePilot",
+      "desc": "影视自动化管理",
+      "config": "  moviepilot:\n    image: jxxghp/moviepilot-v2:latest\n    container_name: moviepilot\n    hostname: moviepilot-v2\n    restart: unless-stopped\n    networks:\n      - moviepilot-network\n    ports:\n      - \"3000:3000\"\n      - \"3001:3001\"\n    volumes:\n      - ${MEDIA_DIR}:/media\n      - ${DOCKER_PATH}/moviepilot/config:/config\n      - ${DOCKER_PATH}/moviepilot/core:/moviepilot/.cache/ms-playwright\n      - /var/run/docker.sock:/var/run/docker.sock:ro\n    environment:\n      - NGINX_PORT=3000\n      - PORT=3001\n      - PUID=0\n      - PGID=0\n      - UMASK=000\n      - TZ=Asia/Shanghai\n      - SUPERUSER=admin\n      - SUPERUSER_PASSWORD=a123456!@\n      - AUTH_SITE=hhclub\n      - HHCLUB_USERNAME=kidoneself\n      - HHCLUB_PASSKEY=0bd1c21acf6d3880e34e3fa5489ccdca\n    extra_hosts:\n      - \"host.docker.internal:host-gateway\"",
+      "downloadUrl": "https://dockpilot.oss-cn-shanghai.aliyuncs.com/moviepilot.tgz",
+      "category": "media",
+      "requiresNetwork": "moviepilot-network"
+    },
+    "qbittorrent": {
+      "name": "qBittorrent",
+      "desc": "BT下载工具",
+      "config": "  qbittorrent:\n    image: linuxserver/qbittorrent:latest\n    container_name: qbittorrent\n    restart: unless-stopped\n    networks:\n      - moviepilot-network\n    ports:\n      - \"8080:8080\"\n    environment:\n      - PUID=0\n      - PGID=0\n      - TZ=Asia/Shanghai\n      - WEBUI_PORT=8080\n    volumes:\n      - ${MEDIA_DIR}:/media\n      - ${DOCKER_PATH}/qbittorrent:/config\n    mem_limit: 1g",
+      "downloadUrl": "https://dockpilot.oss-cn-shanghai.aliyuncs.com/qbittorrent.tgz",
+      "category": "download",
+      "requiresNetwork": "moviepilot-network"
+    },
+    "transmission": {
+      "name": "Transmission",
+      "desc": "BT下载工具",
+      "config": "  transmission:\n    image: linuxserver/transmission:4.0.5\n    container_name: transmission\n    restart: unless-stopped\n    networks:\n      - moviepilot-network\n    ports:\n      - \"9091:9091\"\n    environment:\n      - PUID=0\n      - PGID=0\n      - TZ=Asia/Shanghai\n      - USER=admin\n      - PASS=a123456!@\n    volumes:\n      - ${MEDIA_DIR}:/media\n      - ${DOCKER_PATH}/transmission:/config",
+      "downloadUrl": "https://dockpilot.oss-cn-shanghai.aliyuncs.com/transmission.tgz",
+      "category": "download",
+      "requiresNetwork": "moviepilot-network"
+    },
+    "embyserver": {
+      "name": "EmbyServer",
+      "desc": "媒体服务器",
+      "config": "  embyserver:\n    image: amilys/embyserver:latest\n    container_name: embyserver\n    restart: unless-stopped\n    networks:\n      - moviepilot-network\n    ports:\n      - \"8096:8096\"\n    devices:\n      - \"/dev/dri:/dev/dri\"\n    volumes:\n      - ${MEDIA_DIR}:/media\n      - ${DOCKER_PATH}/embyserver:/config\n    environment:\n      - UID=0\n      - GID=0\n      - GIDLIST=0\n      - TZ=Asia/Shanghai",
+      "downloadUrl": "https://dockpilot.oss-cn-shanghai.aliyuncs.com/embyserver.tgz",
+      "category": "media",
+      "requiresNetwork": "moviepilot-network"
+    },
+    "roon-server": {
+      "name": "Roon Server",
+      "desc": "音乐服务器",
+      "config": "  roon-server:\n    image: steefdebruijn/docker-roonserver:latest\n    container_name: docker-roonserver\n    restart: always\n    network_mode: host\n    volumes:\n      - ${DOCKER_PATH}/roon:/app\n      - ${DOCKER_PATH}/roon/data:/backup\n      - ${DOCKER_PATH}/roon/data:/data\n      - ${MUSIC_DIR}:/music",
+      "downloadUrl": "https://dockpilot.oss-cn-shanghai.aliyuncs.com/roon.tgz",
+      "category": "media"
+    },
+    "bililive-go": {
+      "name": "BiliLive-Go",
+      "desc": "哔哩哔哩直播录制",
+      "config": "  bililive-go:\n    image: chigusa/bililive-go:latest\n    container_name: bililive-go\n    restart: always\n    networks:\n      - default\n    ports:\n      - \"8090:8080\"\n    volumes:\n      - ${RECORD_DIR}:/srv/bililive",
+      "downloadUrl": "",
+      "category": "tool"
+    },
+    "clash": {
+      "name": "Clash",
+      "desc": "代理服务",
+      "config": "  clash:\n    image: laoyutang/clash-and-dashboard:latest\n    container_name: clash\n    restart: always\n    logging:\n      driver: \"json-file\"\n      options:\n        max-size: \"1m\"\n    volumes:\n      - ${DOCKER_PATH}/clash:/root/.config/clash\n    ports:\n      - \"7888:8080\"\n      - \"7890:7890\"",
+      "downloadUrl": "https://dockpilot.oss-cn-shanghai.aliyuncs.com/clash.tgz",
+      "category": "network"
+    },
+    "frpc": {
+      "name": "FRP Client",
+      "desc": "内网穿透客户端",
+      "config": "  frpc:\n    image: fatedier/frpc:v0.61.2\n    container_name: frpc\n    restart: always\n    environment:\n      - TZ=Asia/Shanghai\n    volumes:\n      - ${DOCKER_PATH}/frpc:/opt/frpc\n    command: -c /opt/frpc/frpc.toml",
+      "downloadUrl": "",
+      "category": "network"
+    },
+    "omni-tools": {
+      "name": "Omni Tools",
+      "desc": "多功能工具集",
+      "config": "  omni-tools:\n    image: iib0011/omni-tools:latest\n    container_name: omni-tools\n    ports:\n      - \"18080:80\"\n    restart: unless-stopped",
+      "downloadUrl": "",
+      "category": "tool"
+    }
+  },
+  "networks": {
+    "moviepilot-network": {
+      "driver": "bridge"
+    }
+  },
+  "defaultEnvVars": {
+    "DOCKER_PATH": "/volume1/docker",
+    "MEDIA_DIR": "/volume1/media",
+    "MUSIC_DIR": "/volume1/music",
+    "RECORD_DIR": "/volume1/record"
+  }
+};
