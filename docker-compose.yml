@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  naspt:
+    image: docker.1ms.run/kidself/naspt:latest
+    container_name: naspt
+    restart: unless-stopped
+    ports:
+      - "15432:15432"
+    environment:
+      - TZ=Asia/Shanghai
+
+
+
+

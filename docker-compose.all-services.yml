@@ -1,0 +1,146 @@
+services:
+  # MoviePilot 影视自动化管理
+  moviepilot:
+    image: jxxghp/moviepilot-v2:latest
+    container_name: moviepilot
+    hostname: moviepilot-v2
+    restart: unless-stopped
+    networks:
+      - moviepilot-network
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ${MEDIA_DIR}:/media
+      - ${DOCKER_PATH}/moviepilot/config:/config
+      - ${DOCKER_PATH}/moviepilot/core:/moviepilot/.cache/ms-playwright
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_PORT=3000
+      - PORT=3001
+      - PUID=0
+      - PGID=0
+      - UMASK=000
+      - TZ=Asia/Shanghai
+      - SUPERUSER=admin
+      - SUPERUSER_PASSWORD=a123456!@
+      - AUTH_SITE=hhclub
+      - HHCLUB_USERNAME=kidoneself
+      - HHCLUB_PASSKEY=0bd1c21acf6d3880e34e3fa5489ccdca
+      # PROXY_HOST 可选，如果需要代理则取消注释
+      # - PROXY_HOST=${PROXY_HOST}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # qBittorrent BT下载工具
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    networks:
+      - moviepilot-network
+    ports:
+      - "8080:8080"
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=8080
+    volumes:
+      - ${MEDIA_DIR}:/media
+      - ${DOCKER_PATH}/qbittorrent:/config
+    mem_limit: 1g
+
+  # Transmission BT下载工具
+  transmission:
+    image: linuxserver/transmission:4.0.5
+    container_name: transmission
+    restart: unless-stopped
+    networks:
+      - moviepilot-network
+    ports:
+      - "9091:9091"
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Shanghai
+      - USER=admin
+      - PASS=a123456!@
+    volumes:
+      - ${MEDIA_DIR}:/media
+      - ${DOCKER_PATH}/transmission:/config
+
+  # EmbyServer 媒体服务器
+  embyserver:
+    image: amilys/embyserver:latest
+    container_name: embyserver
+    restart: unless-stopped
+    networks:
+      - moviepilot-network
+    ports:
+      - "8096:8096"
+    devices:
+      - "/dev/dri:/dev/dri"
+    volumes:
+      - ${MEDIA_DIR}:/media
+      - ${DOCKER_PATH}/embyserver:/config
+    environment:
+      - UID=0
+      - GID=0
+      - GIDLIST=0
+      - TZ=Asia/Shanghai
+
+  # Roon Server 音乐服务器
+  roon-server:
+    image: steefdebruijn/docker-roonserver:latest
+    container_name: docker-roonserver
+    restart: always
+    network_mode: host
+    volumes:
+      - ${DOCKER_PATH}/roon:/app
+      - ${DOCKER_PATH}/roon/data:/backup
+      - ${DOCKER_PATH}/roon/data:/data
+      - ${MUSIC_DIR}:/music
+
+  # BiliLive-Go 哔哩哔哩直播录制
+  bililive-go:
+    image: chigusa/bililive-go:latest
+    container_name: bililive-go
+    restart: always
+    networks:
+      - default
+    ports:
+      - "8090:8080"
+    volumes:
+      - ${RECORD_DIR}:/srv/bililive
+
+  # Clash 代理服务
+  clash:
+    image: laoyutang/clash-and-dashboard:latest
+    container_name: clash
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+    volumes:
+      - ${DOCKER_PATH}/clash:/root/.config/clash
+    ports:
+      - "7888:8080"  # Web管理端口
+      - "7890:7890"  # 代理端口
+
+  # FRP Client 内网穿透客户端
+  frpc:
+    image: fatedier/frpc:v0.61.2
+    container_name: frpc
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ${DOCKER_PATH}/frpc:/opt/frpc
+    command: -c /opt/frpc/frpc.toml
+
+networks:
+  moviepilot-network:
+    driver: bridge
+

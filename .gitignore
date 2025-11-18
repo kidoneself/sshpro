@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# Local data
+docker/compose/*.yml
+docker/compose/.env
+docker/downloads/*
+docker/tmp/*
+!docker/compose/.gitkeep
+!docker/downloads/.gitkeep
+!docker/tmp/.gitkeep
+
+# Config files with sensitive data
+services.json
+share_result_*.json
+

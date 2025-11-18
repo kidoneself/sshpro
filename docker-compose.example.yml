@@ -1,0 +1,11 @@
+# Paste your YAML content here
+version: '3.8'
+
+services:
+  clash:
+    image: laoyutang/clash-and-dashboard:latest
+    container_name: clash
+    restart: always
+    network_mode: host
+    volumes:
+      - ${DOCKER_PATH}/clash:/root/.config/clash
