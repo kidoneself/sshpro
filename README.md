@@ -27,7 +27,7 @@
   - `<配置路径>/naspt/` - 主目录
   - `<配置路径>/naspt/downloads/` - 下载文件
   - `<配置路径>/naspt/tmp/` - 临时文件
-  - `<配置路径>/naspt/compose/` - Docker Compose配置
+  - `<配置路径>/naspt/compose/` - Docker Compose
 
 ### 5. 服务配置加载
 - 支持从远程JSON URL加载服务配置
@@ -86,7 +86,7 @@ bash build-docker.sh latest kidself
 
 ### 4. 部署Docker Compose
 
-1. 在"Docker Compose配置"区域编辑 `docker-compose.yml` 内容
+1. 在"Docker Compose"区域编辑 `docker-compose.yml` 内容
 2. （可选）点击"配置.env"按钮编辑环境变量
 3. 点击"启动服务"、"停止服务"或"查看日志"按钮
 4. 配置文件会自动保存到远程服务器的 `<配置路径>/naspt/compose/` 目录
@@ -123,7 +123,7 @@ naspt/
 ├── templates/
 │   └── index.html           # 主页面
 ├── docker/                  # 本地数据目录（用于开发）
-│   ├── compose/            # Compose配置文件
+│   ├── compose/            # Compose文件
 │   ├── downloads/          # 下载文件
 │   └── tmp/                # 临时文件
 ├── docs/                    # 文档目录

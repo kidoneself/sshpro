@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSH & Docker 管理工具</title>
+    <title>naspt</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -1029,7 +1029,20 @@
             <!-- 顶部标题栏 -->
             <div class="top-header">
                 <div class="header-left">
-                    <h1 class="app-title"><i class="fab fa-docker"></i> Docker 部署管理平台</h1>
+                    <h1 class="app-title">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                            <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                            <path d="M8 12L16 8L24 12L16 16L8 12Z" fill="white" opacity="0.9"/>
+                            <path d="M8 16L16 20L24 16V20L16 24L8 20V16Z" fill="white" opacity="0.7"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#3b82f6"/>
+                                    <stop offset="1" stop-color="#2563eb"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        naspt
+                    </h1>
                 </div>
                 <div class="header-right">
                     <div class="connection-status" id="connection-status">
@@ -1047,17 +1060,17 @@
                             <i class="fas fa-network-wired"></i>
                             <span>SSH 连接</span>
                         </div>
-                        <div class="nav-item" data-step="download">
-                            <i class="fas fa-download"></i>
-                            <span>文件下载</span>
-                        </div>
                         <div class="nav-item" data-step="services">
                             <i class="fas fa-cube"></i>
                             <span>服务选择</span>
                         </div>
+                        <div class="nav-item" data-step="download">
+                            <i class="fas fa-download"></i>
+                            <span>文件下载</span>
+                        </div>
                         <div class="nav-item" data-step="compose">
                             <i class="fab fa-docker"></i>
-                            <span>Compose 配置</span>
+                            <span>Compose</span>
                         </div>
                     </nav>
                 </div>
@@ -1092,11 +1105,41 @@
                             </div>
                         </div>
 
-                        <!-- 步骤2: 文件下载 -->
+                        <!-- 步骤2: 服务选择 -->
+                        <div class="step-content" id="step-services">
+                            <div class="step-header">
+                                <h2><i class="fas fa-cube"></i> 服务选择</h2>
+                                <p class="step-description">选择要安装的 Docker 服务，自动填充下载链接</p>
+                            </div>
+                            <div class="step-body">
+                                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                                    <input type="text" id="services-json-url" placeholder="输入JSON链接，例如: https://example.com/services.json" style="flex: 1; min-width: 0;">
+                                    <button class="btn-check" id="load-services-btn" style="padding: 12px 20px; flex-shrink: 0;">
+                                        <i class="fas fa-cloud-download-alt"></i> 加载
+                                    </button>
+                                </div>
+                                <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-end;">
+                                    <button class="btn-check" id="select-all-services-btn" style="padding: 10px 16px;">
+                                        <i class="fas fa-check-square"></i> 全选
+                                    </button>
+                                    <button class="btn-check" id="deselect-all-services-btn" style="padding: 10px 16px;">
+                                        <i class="fas fa-square"></i> 全不选
+                                    </button>
+                                    <button class="btn-check" id="generate-compose-btn" style="padding: 10px 16px;">
+                                        <i class="fas fa-magic"></i> 生成 Compose
+                                    </button>
+                                </div>
+                                <div id="services-checkbox-container" class="services-grid">
+                                    <!-- 动态生成复选框 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 步骤3: 文件下载 -->
                         <div class="step-content" id="step-download">
                             <div class="step-header">
                                 <h2><i class="fas fa-download"></i> 文件下载</h2>
-                                <p class="step-description">配置 Docker 路径并下载文件</p>
+                                <p class="step-description">配置 Docker 路径并下载文件（已选服务的下载链接会自动填充）</p>
                             </div>
                             <div class="step-body">
                                 <!-- Docker 路径配置 -->
@@ -1130,47 +1173,20 @@
                             </div>
                         </div>
                         
-                        <!-- 步骤3: 服务选择器 -->
-                        <div class="step-content" id="step-services">
-                            <div class="step-header">
-                                <h2><i class="fas fa-cube"></i> 服务选择</h2>
-                                <p class="step-description">选择要安装的 Docker 服务</p>
-                            </div>
-                            <div class="step-body">
-                                <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-                                    <input type="text" id="services-json-url" placeholder="输入JSON链接，例如: https://example.com/services.json" style="flex: 1; min-width: 0;">
-                                    <button class="btn-check" id="load-services-btn" style="padding: 12px 20px; flex-shrink: 0;">
-                                        <i class="fas fa-cloud-download-alt"></i> 加载
-                                    </button>
-                                </div>
-                                <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-end;">
-                                    <button class="btn-check" id="select-all-services-btn" style="padding: 10px 16px;">
-                                        <i class="fas fa-check-square"></i> 全选
-                                    </button>
-                                    <button class="btn-check" id="deselect-all-services-btn" style="padding: 10px 16px;">
-                                        <i class="fas fa-square"></i> 全不选
-                                    </button>
-                                    <button class="btn-check" id="generate-compose-btn" style="padding: 10px 16px;">
-                                        <i class="fas fa-magic"></i> 生成 Compose
-                                    </button>
-                                </div>
-                                <div id="services-checkbox-container" class="services-grid">
-                                    <!-- 动态生成复选框 -->
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- 步骤4: Compose编辑器 -->
                         <div class="step-content" id="step-compose">
                             <div class="step-header">
-                                <h2><i class="fab fa-docker"></i> Docker Compose 配置</h2>
+                                <h2><i class="fab fa-docker"></i> Docker Compose</h2>
                                 <p class="step-description">编辑 docker-compose.yml 文件并部署服务</p>
                             </div>
                             <div class="step-body" style="display: flex; flex-direction: column; min-height: 500px;">
                                 <!-- 隐藏的env-editor，用于存储环境变量配置（部署时使用） -->
                                 <textarea id="env-editor" style="display: none;"></textarea>
                                 
-                                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 16px;">
+                                    <button class="btn-check" id="format-compose-btn" style="padding: 10px 16px;" title="格式化YAML">
+                                        <i class="fas fa-magic"></i> 格式化
+                                    </button>
                                     <button class="btn-check" id="config-env-btn" style="padding: 10px 16px;">
                                         <i class="fas fa-file-code"></i> 配置 .env
                                     </button>
@@ -1213,6 +1229,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <script>
         const socket = io();
         const DEFAULT_REMOTE_BASE_DIR = JSON.parse('{{ remote_base_dir|tojson|safe }}');
@@ -1609,6 +1626,22 @@
         loadSSHInfo(); // 这会调用loadSSHConnections()
         loadConfigPaths();
         
+        // 页面加载完成后，尝试自动重连上次的SSH连接
+        setTimeout(() => {
+            const lastConnectedId = localStorage.getItem('last_connected_ssh_id');
+            if (lastConnectedId && !isConnected) {
+                const connection = sshConnections.find(conn => conn.id === lastConnectedId);
+                if (connection) {
+                    console.log('检测到上次连接，自动重连:', connection.name);
+                    showStatus('正在恢复上次的SSH连接...', 'info');
+                    connectToSSH(lastConnectedId);
+                } else {
+                    // 如果找不到连接，清除保存的ID
+                    localStorage.removeItem('last_connected_ssh_id');
+                }
+            }
+        }, 500); // 延迟500ms确保socket已连接
+        
         // 连接按钮事件委托（备用方案，如果onclick不工作）
         document.addEventListener('click', (e) => {
             const connectBtn = e.target.closest('.connect-btn');
@@ -1792,6 +1825,9 @@
             socket.emit('ssh_disconnect');
             term.clear();
             isConnected = false;
+            
+            // 清除保存的连接ID
+            localStorage.removeItem('last_connected_ssh_id');
             updateConnectionStatus(false);
             // 更新连接列表状态
             if (currentConnectionId) {
@@ -2074,6 +2110,11 @@
             connectingConnectionId = null; // 清除连接中状态
             updateConnectionStatus(true);
             
+            // 保存当前连接ID，用于刷新后自动重连
+            if (currentConnectionId) {
+                localStorage.setItem('last_connected_ssh_id', currentConnectionId);
+            }
+            
             // 更新连接状态显示
             const statusEl = document.getElementById('connection-status');
             if (statusEl) {
@@ -2270,7 +2311,7 @@
         let serviceDownloadUrls = {};
         let serviceNetworks = {};
         let defaultEnvVars = {};
-        let extractedEnvVars = {}; // 从compose配置中提取的环境变量
+        let extractedEnvVars = {}; // 从compose中提取的环境变量
         
         // 初始化服务选择器
         function initServiceSelector() {
@@ -2531,6 +2572,41 @@
         // 页面加载时初始化（如果没有从JSON加载）
         if (Object.keys(allServices).length === 0) {
             initServiceSelector();
+        }
+        
+        // 格式化 Compose 配置
+        const formatComposeBtn = document.getElementById('format-compose-btn');
+        if (formatComposeBtn) {
+            formatComposeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const composeEditor = document.getElementById('compose-editor');
+                const content = composeEditor.value.trim();
+                
+                if (!content) {
+                    showStatus('编辑器内容为空', 'error');
+                    return;
+                }
+                
+                try {
+                    // 解析 YAML
+                    const parsed = jsyaml.load(content);
+                    
+                    // 格式化输出（缩进2个空格）
+                    const formatted = jsyaml.dump(parsed, {
+                        indent: 2,
+                        lineWidth: -1,  // 不限制行宽
+                        noRefs: true,   // 不使用引用
+                        sortKeys: false // 不排序key，保持原顺序
+                    });
+                    
+                    composeEditor.value = formatted;
+                    showStatus('格式化成功！', 'success');
+                } catch (error) {
+                    showStatus(`格式化失败: ${error.message}`, 'error');
+                }
+            });
         }
         
         // 配置 .env 文件（打开模态框）

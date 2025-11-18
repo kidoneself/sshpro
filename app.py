@@ -325,7 +325,7 @@ def handle_ssh_disconnect():
 
 @socketio.on('deploy_compose')
 def handle_deploy_compose(data):
-    """部署Docker Compose配置"""
+    """部署Docker Compose"""
     try:
         session_id = request.sid
         if session_id not in ssh_connections:
