@@ -1,15 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
+import sys
+
+# 获取项目根目录（spec文件所在目录的父目录）
+spec_dir = os.path.dirname(os.path.abspath(SPEC))
+project_root = os.path.dirname(spec_dir)
 
 block_cipher = None
 
 a = Analysis(
-    ['app.py'],
-    pathex=[],
+    [os.path.join(project_root, 'app.py')],
+    pathex=[project_root],
     binaries=[],
     datas=[
-        ('templates', 'templates'),
-    ] + ([('static', 'static')] if os.path.exists('static') and os.listdir('static') else []),
+        (os.path.join(project_root, 'templates'), 'templates'),
+    ] + ([(os.path.join(project_root, 'static'), 'static')] if os.path.exists(os.path.join(project_root, 'static')) and os.listdir(os.path.join(project_root, 'static')) else []),
     hiddenimports=[
         'eventlet',
         'flask_socketio',
