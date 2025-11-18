@@ -6,9 +6,21 @@ import requests
 import time
 import base64
 import sys
+import webbrowser
+import threading
 from parse_share_link import FeiNiuShareParser
 
-app = Flask(__name__)
+# 处理打包后的路径
+if getattr(sys, 'frozen', False):
+    # 打包后的路径（exe模式）
+    BASE_PATH = sys._MEIPASS
+    # 打包后需要显式指定模板路径
+    app = Flask(__name__, template_folder=os.path.join(BASE_PATH, 'templates'))
+else:
+    # 开发环境和Docker环境（使用默认路径）
+    BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+    app = Flask(__name__)
+
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -436,6 +448,29 @@ def index():
         remote_tmp_dir=paths['tmp']
     )
 
+def open_browser():
+    """延迟打开浏览器"""
+    time.sleep(1.5)
+    try:
+        webbrowser.open('http://localhost:15432')
+    except Exception as e:
+        print(f"无法自动打开浏览器: {e}")
+        print("请手动访问: http://localhost:15432")
+
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=15432, debug=True, allow_unsafe_werkzeug=True)
+    # 如果是打包后的exe，自动打开浏览器
+    if getattr(sys, 'frozen', False):
+        threading.Thread(target=open_browser, daemon=True).start()
+        print("=" * 50)
+        print("NASPT - SSH & Docker 管理工具")
+        print("=" * 50)
+        print("服务已启动: http://localhost:15432")
+        print("按 Ctrl+C 停止服务")
+        print("=" * 50)
+    
+    # 开发环境使用0.0.0.0，打包后使用127.0.0.1（更安全）
+    host = '127.0.0.1' if getattr(sys, 'frozen', False) else '0.0.0.0'
+    debug = not getattr(sys, 'frozen', False)
+    
+    socketio.run(app, host=host, port=15432, debug=debug, allow_unsafe_werkzeug=True)
 

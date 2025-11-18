@@ -120,15 +120,29 @@ naspt/
 ├── parse_share_link.py       # 飞牛分享链接解析器
 ├── requirements.txt          # Python依赖
 ├── Dockerfile               # Docker构建文件
-├── build-docker.sh          # 多平台构建脚本
 ├── templates/
 │   └── index.html           # 主页面
 ├── docker/                  # 本地数据目录（用于开发）
 │   ├── compose/            # Compose配置文件
 │   ├── downloads/          # 下载文件
 │   └── tmp/                # 临时文件
-├── docker-compose.yml       # 示例Compose配置
-├── services.example.json    # 示例服务配置
+├── docs/                    # 文档目录
+│   ├── BUILD_EXE.md        # EXE打包指南
+│   ├── DOCKER_BUILD.md     # Docker构建文档
+│   └── SIGNATURE_ALGORITHM.md  # 签名算法文档
+├── scripts/                 # 脚本目录
+│   ├── build-docker.sh     # Docker多平台构建脚本
+│   ├── build-docker-local.sh  # Docker本地构建脚本
+│   ├── build-exe.bat       # Windows EXE打包脚本
+│   ├── build-exe.sh        # Linux/macOS EXE打包脚本
+│   ├── build-exe.spec      # PyInstaller配置文件
+│   └── requirements-build.txt  # 打包依赖
+├── examples/                # 示例配置文件
+│   ├── docker-compose.naspt.yml  # NASPT部署配置
+│   ├── docker-compose.all-services.yml  # 完整服务配置示例
+│   ├── docker-compose.example.yml  # 简单配置示例
+│   ├── services.example.json  # 服务配置JSON模板
+│   └── README.md            # 示例文件说明
 └── README.md               # 说明文档
 ```
 
@@ -152,7 +166,7 @@ docker build -t kidself/naspt:latest .
 
 # 多平台构建（需要先创建buildx builder）
 docker buildx create --name multiarch-builder --use
-bash build-docker.sh latest kidself
+bash scripts/build-docker.sh latest kidself
 ```
 
 ## 注意事项
