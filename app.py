@@ -75,6 +75,37 @@ def filter_non_critical_errors(error_output: str) -> str:
         lines.append(line)
     return '\n'.join(line for line in lines if line.strip())
 
+
+def replace_env_variables(content, env_content):
+    """
+    替换内容中的环境变量
+    :param content: 原始内容
+    :param env_content: .env文件内容
+    :return: 替换后的内容
+    """
+    if not env_content.strip():
+        return content
+    
+    # 解析env文件
+    env_vars = {}
+    for line in env_content.split('\n'):
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        try:
+            key, value = line.split('=', 1)
+            env_vars[key] = value.strip('"\'')
+        except ValueError:
+            continue
+    
+    # 替换变量
+    for key, value in env_vars.items():
+        # 替换 ${VAR} 和 $VAR 格式的变量
+        content = content.replace(f'${{{key}}}', value).replace(f'${key}', value)
+    
+    return content
+
+
 def create_ssh_connection(host, port, username, password):
     """创建SSH连接"""
     try:
@@ -326,24 +357,17 @@ def handle_deploy_compose(data):
         compose_file = f'{work_dir}/docker-compose.yml'
         env_file = f'{work_dir}/.env'
         
-        # 上传docker-compose.yml - 使用base64编码避免特殊字符问题
-        compose_b64 = base64.b64encode(compose_content.encode('utf-8')).decode('ascii')
+        # 替换环境变量
+        processed_compose = replace_env_variables(compose_content, env_content)
+        
+        # 上传处理后的docker-compose.yml - 使用base64编码避免特殊字符问题
+        compose_b64 = base64.b64encode(processed_compose.encode('utf-8')).decode('ascii')
         command = f'echo "{compose_b64}" | base64 -d > "{compose_file}"'
         stdin, stdout, stderr = ssh.exec_command(command, timeout=10)
         raw_error = stderr.read().decode('utf-8')
         error = filter_non_critical_errors(raw_error)
         if error and 'No such file' not in error:  # 忽略目录不存在的错误（会在下面创建）
             raise Exception(f'写入compose文件失败: {error}')
-        
-        # 上传.env文件（如果有）
-        if env_content.strip():
-            env_b64 = base64.b64encode(env_content.encode('utf-8')).decode('ascii')
-            command = f'echo "{env_b64}" | base64 -d > "{env_file}"'
-            stdin, stdout, stderr = ssh.exec_command(command, timeout=10)
-            raw_error = stderr.read().decode('utf-8')
-            error = filter_non_critical_errors(raw_error)
-            if error:
-                raise Exception(f'写入env文件失败: {error}')
         
         # 执行docker-compose命令（支持新格式 docker compose 和旧格式 docker-compose）
         # 先检测使用哪个命令
