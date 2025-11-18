@@ -60,6 +60,21 @@ def log_ssh(msg):
     print(msg)
     sys.stdout.flush()
 
+
+def filter_non_critical_errors(error_output: str) -> str:
+    """忽略已知的非关键性错误提示"""
+    if not error_output:
+        return ''
+    ignored_phrases = [
+        'Could not chdir to home directory'
+    ]
+    lines = []
+    for line in error_output.splitlines():
+        if any(phrase in line for phrase in ignored_phrases):
+            continue
+        lines.append(line)
+    return '\n'.join(line for line in lines if line.strip())
+
 def create_ssh_connection(host, port, username, password):
     """创建SSH连接"""
     try:
@@ -315,7 +330,8 @@ def handle_deploy_compose(data):
         compose_b64 = base64.b64encode(compose_content.encode('utf-8')).decode('ascii')
         command = f'echo "{compose_b64}" | base64 -d > "{compose_file}"'
         stdin, stdout, stderr = ssh.exec_command(command, timeout=10)
-        error = stderr.read().decode('utf-8')
+        raw_error = stderr.read().decode('utf-8')
+        error = filter_non_critical_errors(raw_error)
         if error and 'No such file' not in error:  # 忽略目录不存在的错误（会在下面创建）
             raise Exception(f'写入compose文件失败: {error}')
         
@@ -324,7 +340,8 @@ def handle_deploy_compose(data):
             env_b64 = base64.b64encode(env_content.encode('utf-8')).decode('ascii')
             command = f'echo "{env_b64}" | base64 -d > "{env_file}"'
             stdin, stdout, stderr = ssh.exec_command(command, timeout=10)
-            error = stderr.read().decode('utf-8')
+            raw_error = stderr.read().decode('utf-8')
+            error = filter_non_critical_errors(raw_error)
             if error:
                 raise Exception(f'写入env文件失败: {error}')
         
